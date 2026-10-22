@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en" class="theme-midnight">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin sign in · EGS Quizit!</title>
+<link rel="stylesheet" href="/theme.css">
+<style>
+body{min-height:100vh;display:grid;place-items:center;margin:0;padding:16px;background:var(--bg);color:var(--text)}
+.login-card{width:min(430px,100%);padding:clamp(24px,5vw,40px)}
+.login-card h1{font-size:32px;letter-spacing:-.055em;margin:10px 0}
+.login-copy{font-size:14px;line-height:1.6;color:var(--muted);margin:0 0 24px}
+.login-form{display:grid;gap:13px}
+.login-field{width:100%;min-height:47px}
+.login-form .primary,.login-form .secondary{width:100%;min-height:46px}
+.login-message{min-height:18px;margin:0;font-size:13px;line-height:1.5;color:var(--muted)}
+.login-message.error{color:var(--bad)}
+.login-alt{display:block;text-align:center;margin-top:20px;color:var(--muted);text-decoration:none;font-size:13px}
+.login-alt:hover{color:var(--accent)}
+.login-note{margin-top:19px;padding:12px 13px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;color:var(--muted);font-size:12px;line-height:1.6}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main class="card login-card">
+  <div class="brand-mark" style="margin-bottom:20px">Q!</div>
+  <div class="eyebrow">EGS QUIZIT! · ADMINISTRATION</div>
+  <h1 id="loginTitle">Sign in</h1>
+  <p class="login-copy" id="loginCopy">Use your approved administrator login ID and password. Visitors never need to sign in to view the question or change the theme.</p>
+  <form id="loginForm" class="login-form">
+    <div>
+      <label class="field-label" for="loginEmail">Login ID (email)</label>
+      <input id="loginEmail" class="field login-field" type="email" autocomplete="username" placeholder="dev@espeeglobal.com" required autocapitalize="off" spellcheck="false">
+    </div>
+    <div>
+      <label class="field-label" for="loginPassword">Password</label>
+      <input id="loginPassword" class="field login-field" type="password" autocomplete="current-password" placeholder="Enter your password" required minlength="8">
+    </div>
+    <p id="loginMessage" class="login-message" role="status" aria-live="polite"></p>
+    <button id="loginSubmit" type="submit" class="primary">Sign in securely</button>
+    <button id="createAccount" type="button" class="secondary">First-time admin? Create account</button>
+  </form>
+  <div class="login-note">
+    <strong>Admin account setup</strong><br>
+    The approved login ID is <strong>dev@espeeglobal.com</strong>. Account creation is limited to this approved address. Supabase confirms new accounts by email when confirmation is enabled.
+    <div style="margin-top:9px"><a href="https://supabase.com/dashboard/project/uafzfoddvneblhgncdrb/auth/users" style="color:var(--accent)">Open Supabase Auth users ↗</a></div>
+  </div>
+  <a class="login-alt" href="/">← Return to the live question</a>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+(function(){
+ const url='https://uafzfoddvneblhgncdrb.supabase.co';
+ const key='sb_publishable_6r5C2eoz6k1ZmpeCszCKWw_EjMIP9h-';
+ const sb=window.supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+ const form=document.getElementById('loginForm'),emailEl=document.getElementById('loginEmail'),passwordEl=document.getElementById('loginPassword');
+ const submit=document.getElementById('loginSubmit'),create=document.getElementById('createAccount'),msg=document.getElementById('loginMessage');
+ let mode='signin';
+ function say(s,error){msg.textContent=s||'';msg.className='login-message'+(error?' error':'')}
+ function nextPath(){const p=new URLSearchParams(location.search).get('next')||'/?view=admin';return p.startsWith('/')&&!p.startsWith('//')&&!p.includes('\\')?p:'/?view=admin'}
+ async function goIfAdmin(){
+   const {data:{user},error}=await sb.auth.getUser();
+   if(error||!user)return false;
+   const {data,isError}=await sb.rpc('quizit_is_admin');
+   if(isError||data!==true){say('This login is not approved for administrator controls.',true);return false}
+   location.replace(nextPath());return true;
+ }
+ sb.auth.getSession().then(async ({data})=>{if(data.session)await goIfAdmin()}).catch(()=>{});
+ create.addEventListener('click',async()=>{
+   const email=emailEl.value.trim().toLowerCase();
+   const password=passwordEl.value;
+   if(email!=='dev@espeeglobal.com'){say('Only the approved administrator login ID can create an account.',true);return}
+   if(password.length<8){say('Use a password of at least 8 characters.',true);return}
+   submit.disabled=true;create.disabled=true;say('Creating the approved admin account…');
+   try{
+     const {data,error}=await sb.auth.signUp({email,password,options:{emailRedirectTo:location.origin+'/admin-access'}});
+     if(error)throw error;
+     if(data.session&&data.user){
+       const check=await sb.rpc('quizit_is_admin');
+       if(check.error||check.data!==true){await sb.auth.signOut();throw new Error('Account created, but it is not approved for admin access. Verify the admin allowlist.')}
+       location.replace(nextPath());return;
+     }
+     say('Check the email inbox for dev@espeeglobal.com and confirm the account. If the confirmation link cannot return to this app, add '+location.origin+' to Supabase Auth → URL Configuration → Redirect URLs, then use sign in.');
+     mode='signin';
+   }catch(e){say(e.message||'Could not create the admin account.',true)}
+   finally{submit.disabled=false;create.disabled=false}
+ });
+ form.addEventListener('submit',async e=>{
+   e.preventDefault();submit.disabled=true;create.disabled=true;say('');
+   try{
+     const email=emailEl.value.trim().toLowerCase(),password=passwordEl.value;
+     if(!email||!password)throw new Error('Enter your login ID and password.');
+     const {error}=await sb.auth.signInWithPassword({email,password});
+     if(error)throw error;
+     const ok=await goIfAdmin();
+     if(!ok)await sb.auth.signOut();
+   }catch(e){say(e.message||'Sign in failed. Check the login ID and password.',true)}
+   finally{submit.disabled=false;create.disabled=false}
+ });
+})();
+</script>
+</body>
+</html>

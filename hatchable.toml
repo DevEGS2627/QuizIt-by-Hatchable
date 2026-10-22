@@ -1,0 +1,1 @@
+# EGS Quizit! uses Supabase Auth for email/password login and Supabase Postgres for quiz data.
