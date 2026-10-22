@@ -917,3 +917,28 @@ html.presentation-open,body.presentation-open{overflow:hidden!important;height:1
  42%{transform:scale(1.012)}
  100%{transform:scale(1)}
 }
+
+/* Audience question pool setup and status. */
+.audience-only-field{border:1px solid color-mix(in srgb,var(--accent) 20%,var(--line));border-radius:12px;padding:12px;background:color-mix(in srgb,var(--accent) 4%,var(--surface))}
+.checkbox-row{display:flex;align-items:flex-start;gap:10px;cursor:pointer}
+.checkbox-row input{width:17px;height:17px;flex:none;margin-top:2px;accent-color:var(--accent)}
+.checkbox-row span{display:grid;gap:4px}
+.checkbox-row strong{font-size:12px}
+.checkbox-row small{color:var(--muted);font-size:11px;line-height:1.4;font-weight:450}
+.audience-question-tag{color:color-mix(in srgb,var(--accent) 80%,var(--text))!important;background:color-mix(in srgb,var(--accent) 12%,var(--surface))!important;border-color:color-mix(in srgb,var(--accent) 25%,var(--line))!important;font-weight:900}
+.team-question-tag{opacity:.82}
+.audience-draw-button{border-color:color-mix(in srgb,var(--accent) 38%,var(--line));background:color-mix(in srgb,var(--accent) 7%,var(--surface));font-weight:800}
+.audience-draw-button:not(:disabled):hover{background:var(--accent);color:var(--accent-ink)}
+.audience-draw-button:disabled{opacity:.48;cursor:not-allowed}
+.audience-usage-note{font-size:11px;color:var(--muted);padding:7px 0 2px;border-top:1px solid var(--line)}
+.audience-usage-note strong{color:var(--text);font-variant-numeric:tabular-nums}
+.audience-pool-panel{display:grid;gap:10px;padding:14px;margin-bottom:14px;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--surface2) 40%,var(--surface))}
+.audience-pool-panel>div:first-child>strong{font-size:13px}
+.audience-pool-panel p{margin:4px 0 0}
+.audience-pool-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.audience-pool-chip{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px;padding:7px 9px;border:1px solid var(--line);border-radius:9px;background:var(--surface);font-size:10px;color:var(--muted)}
+.audience-pool-chip strong{color:var(--text);font-size:11px}
+.audience-pool-chip.ready{border-color:color-mix(in srgb,var(--good) 30%,var(--line))}
+.audience-pool-chip.needs{border-color:color-mix(in srgb,var(--bad) 28%,var(--line));background:color-mix(in srgb,var(--bad) 4%,var(--surface))}
+.audience-pool-chip.complete{border-color:color-mix(in srgb,var(--accent) 36%,var(--line));background:color-mix(in srgb,var(--accent) 6%,var(--surface))}
+@media(max-width:760px){.audience-pool-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.audience-pool-chip{font-size:9px;padding:7px}}
