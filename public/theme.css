@@ -871,3 +871,49 @@ html.presentation-open,body.presentation-open{overflow:hidden!important;height:1
  .answer-reveal-pending,.answer-reveal-pending:before,.answer-sparkle-field span,.answer-reveal-loading,.answer-reveal-progress span,.answer-box.answer-just-revealed,.answer-box.answer-just-revealed .answer-key-text{animation:none!important;filter:none!important;transform:none!important}
  .answer-sparkle-field{display:none}
 }
+
+/* Presentation micro-interactions: keep the screen mounted, animate only the changed item. */
+.presentation-team-pounce-slot{display:contents}
+.presentation-team .score-impact,.presentation-team.score-impact{will-change:transform,box-shadow}
+.presentation-team.score-impact{animation:score-row-flash .68s cubic-bezier(.2,.8,.2,1) both!important}
+.presentation-team .mini-score.score-number-pop{animation:score-number-pop .58s cubic-bezier(.16,1,.3,1) both!important;will-change:transform,filter}
+.presentation-team-pounce-slot>.control-arrive,.presentation-team-pounce-slot>.presentation-team-pounce-actions.control-arrive{animation:control-morph-in .22s cubic-bezier(.16,1,.3,1) both;will-change:transform,opacity}
+.presentation-team-pounce-slot .pounce-mark-btn:active:not(:disabled){transform:scale(.94)}
+.presentation-team-pounce-actions .pounce-pending-mark{animation:pending-chip-pulse .7s ease-in-out infinite alternate}
+.presentation-timer-readout{font-variant-numeric:tabular-nums;contain:layout paint}
+.presentation-timer-dock .timer-action{transition:background-color .16s ease,color .16s ease,border-color .16s ease,transform .16s cubic-bezier(.2,.8,.2,1)}
+.presentation-timer-dock .timer-action:active:not(:disabled){transform:scale(.96)}
+.presentation-team{backface-visibility:hidden;transform:translateZ(0)}
+.presentation-team .mini-score{font-variant-numeric:tabular-nums}
+.score-delta{pointer-events:none}
+@keyframes score-row-flash{
+ 0%{box-shadow:0 0 0 0 transparent;filter:brightness(1)}
+ 28%{box-shadow:0 0 0 2px color-mix(in srgb,var(--good) 36%,transparent),0 8px 22px color-mix(in srgb,var(--accent) 14%,transparent);filter:brightness(1.03)}
+ 100%{box-shadow:0 0 0 0 transparent;filter:brightness(1)}
+}
+@keyframes control-morph-in{0%{opacity:0;transform:translateY(4px) scale(.96)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes pending-chip-pulse{from{opacity:.66;transform:scale(.99)}to{opacity:1;transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){
+ .presentation-team.score-impact,.presentation-team .mini-score.score-number-pop,.presentation-team-pounce-slot>.control-arrive,.presentation-team-pounce-actions .pounce-pending-mark{animation:none!important;will-change:auto!important}
+ .presentation-team{backface-visibility:visible;transform:none}
+}
+
+/* No full-screen re-entrance on ordinary state changes. Keep only intentional first-open and component-level motion. */
+.presentation:not(.presentation-entering){animation:none!important}
+.presentation.presentation-entering{animation:presentation-enter .48s var(--ease-quiz) both!important}
+
+/* Frame-budget polish: animate opacity/transform on one target, never replay the full presentation on a score or pounce. */
+.presentation-team.score-impact{animation:score-row-flash .46s cubic-bezier(.2,.8,.2,1) both!important}
+.presentation-team.pounce-confirm{animation:pounce-team-pop .42s cubic-bezier(.16,1,.3,1) both!important}
+.presentation-team{backface-visibility:hidden;transform-origin:center}
+@keyframes score-row-flash{
+ 0%{transform:scale(1);opacity:1}
+ 32%{transform:scale(1.008);opacity:1}
+ 68%{transform:scale(.999);opacity:1}
+ 100%{transform:scale(1);opacity:1}
+}
+@keyframes pounce-team-pop{
+ 0%{transform:scale(1)}
+ 42%{transform:scale(1.012)}
+ 100%{transform:scale(1)}
+}
