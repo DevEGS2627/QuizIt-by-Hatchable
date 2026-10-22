@@ -821,3 +821,53 @@ main.page-enter .section-block{animation:card-arrive .44s var(--ease-quiz) both}
  .presentation-question-prompt,.presentation-team{transition:none!important}
 }
 html.presentation-open,body.presentation-open{overflow:hidden!important;height:100%!important;overscroll-behavior:none!important}
+
+/* Immediate answer anticipation: the chamber appears on click while the answer fetch is in flight. */
+.answer-reveal-pending{
+ position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;justify-content:center;
+ min-height:74px;padding:12px 16px;margin:0 0 7px;
+ border-left:4px solid var(--good);
+ background:linear-gradient(105deg,color-mix(in srgb,var(--good) 13%,var(--surface2)),color-mix(in srgb,var(--accent) 8%,var(--surface2)) 54%,color-mix(in srgb,var(--good) 12%,var(--surface2)));
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 5px 20px color-mix(in srgb,var(--good) 9%,transparent);
+ animation:answer-chamber-arrive .28s cubic-bezier(.2,.8,.2,1) both;
+}
+.answer-reveal-pending:before{
+ content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+ background:linear-gradient(108deg,transparent 10%,color-mix(in srgb,var(--good) 13%,transparent) 48%,transparent 70%);
+ transform:translateX(-110%);animation:answer-pending-wash 1.45s ease-in-out infinite;
+}
+.answer-sparkle-field{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.answer-sparkle-field span{position:absolute;display:block;color:var(--good);font-size:20px;line-height:1;opacity:0;text-shadow:0 0 12px color-mix(in srgb,var(--good) 55%,transparent);animation:answer-sparkle-float 1.25s cubic-bezier(.2,.7,.25,1) infinite}
+.answer-sparkle-field span:nth-child(1){left:7%;top:23%;font-size:18px;animation-delay:0s}
+.answer-sparkle-field span:nth-child(2){left:31%;top:60%;font-size:13px;animation-delay:.18s}
+.answer-sparkle-field span:nth-child(3){left:58%;top:15%;font-size:16px;animation-delay:.34s}
+.answer-sparkle-field span:nth-child(4){left:78%;top:53%;font-size:12px;animation-delay:.08s}
+.answer-sparkle-field span:nth-child(5){left:92%;top:18%;font-size:18px;animation-delay:.48s}
+.answer-reveal-label,.answer-reveal-loading,.answer-reveal-progress{position:relative;z-index:2}
+.answer-reveal-label{font-size:9px;font-weight:950;letter-spacing:.18em;color:var(--good);margin-bottom:4px}
+.answer-reveal-loading{font-size:clamp(14px,1.2vw,18px);font-weight:850;letter-spacing:-.015em;animation:answer-loading-pulse .8s ease-in-out infinite alternate}
+.answer-reveal-progress{height:3px;max-width:100%;overflow:hidden;background:color-mix(in srgb,var(--good) 15%,var(--line));border-radius:99px;margin-top:9px}
+.answer-reveal-progress span{display:block;width:28%;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--good),var(--accent),var(--good));box-shadow:0 0 12px color-mix(in srgb,var(--good) 48%,transparent);animation:answer-progress-travel .95s ease-in-out infinite alternate}
+.presentation-question .answer-reveal-pending{flex:0 0 auto;max-height:clamp(72px,12vh,104px)}
+.answer-box.answer-just-revealed{
+ position:relative;isolation:isolate;overflow:hidden;transform-origin:50% 0;
+ animation:answer-card-reveal .72s cubic-bezier(.16,1,.3,1) both!important;
+ border-left-width:4px;
+ box-shadow:0 9px 28px color-mix(in srgb,var(--good) 17%,transparent),inset 0 1px 0 rgba(255,255,255,.25);
+}
+.answer-box.answer-just-revealed:after{
+ content:"";position:absolute;inset:-5px;z-index:5;pointer-events:none;
+ background:linear-gradient(112deg,transparent 18%,color-mix(in srgb,var(--good) 28%,transparent) 43%,rgba(255,255,255,.32) 50%,transparent 65%);
+ transform:translateX(-115%);animation:answer-highlight-sweep .76s .03s ease-out both;
+}
+.answer-box.answer-just-revealed .answer-key-text{animation:answer-text-arrive .48s .09s cubic-bezier(.2,.8,.2,1) both}
+@keyframes answer-chamber-arrive{0%{opacity:0;transform:translateY(7px) scale(.985);filter:blur(2px)}100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+@keyframes answer-pending-wash{0%{transform:translateX(-110%)}100%{transform:translateX(110%)}}
+@keyframes answer-sparkle-float{0%{opacity:0;transform:translateY(10px) rotate(-24deg) scale(.35)}26%{opacity:1;transform:translateY(0) rotate(0deg) scale(1)}78%{opacity:.8;transform:translateY(-13px) rotate(15deg) scale(.9)}100%{opacity:0;transform:translateY(-23px) rotate(28deg) scale(.45)}}
+@keyframes answer-loading-pulse{from{opacity:.7;transform:translateY(1px)}to{opacity:1;transform:translateY(-1px)}}
+@keyframes answer-progress-travel{from{transform:translateX(-5%)}to{transform:translateX(270%)}}
+@keyframes answer-text-arrive{0%{opacity:0;transform:translateY(5px);filter:blur(2px)}100%{opacity:1;transform:translateY(0);filter:blur(0)}}
+@media(prefers-reduced-motion:reduce){
+ .answer-reveal-pending,.answer-reveal-pending:before,.answer-sparkle-field span,.answer-reveal-loading,.answer-reveal-progress span,.answer-box.answer-just-revealed,.answer-box.answer-just-revealed .answer-key-text{animation:none!important;filter:none!important;transform:none!important}
+ .answer-sparkle-field{display:none}
+}
