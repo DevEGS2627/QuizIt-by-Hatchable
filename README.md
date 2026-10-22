@@ -13,18 +13,36 @@ Source mirror for the EGS Quizit! inter-school quiz arena, currently hosted on H
 - `public/assets/` — EGS Quizit! and school logos
 - `hatchable.toml` — Hatchable project configuration
 
-## Quiz rules implemented in the application
+## Quiz rules
 
-Rounds are named Science, Sports, General Knowledge, History, Current Affairs and Music. The interface supports a fixed ten-second timer, one question per team in Rounds 1, 2, 4 and 5, two per team in Rounds 3 and 6, up to two audience questions in each non-final round, pounce scoring (+10/−5) during the timer, and paired audio-visual slips in the final round.
+The six rounds are **Science**, **Sports**, **General Knowledge**, **History**, **Current Affairs**, and **Music**. The application uses one 10-second timer, +10 for a correct team answer, 0 for a wrong answer in Rounds 1–5 and −5 in the final round, and +10/−5 pounce scoring during the timer in Rounds 1–5. Pounces are disabled for the question-owning team, audience questions, and the final round.
+
+Rounds 1, 2, 4, and 5 allow one question per team; Round 3 and the final round allow two. Rounds 1–5 support up to two audience questions per round. The final Music round is arranged as eight paired audio slips, with A/B questions sharing each slip.
+
+## Current question bank
+
+The old multiple-choice bank has been replaced. The live Supabase bank contains **554 open-ended questions and 554 answer keys**:
+
+| Round | Questions |
+| --- | ---: |
+| Science | 120 |
+| Sports | 120 |
+| General Knowledge | 120 |
+| History | 120 |
+| Current Affairs (October 2026) | 58 |
+| Music (8 paired audio slips) | 16 |
+| **Total** | **554** |
+
+The bank was verified after activation: all 554 rows are available, answer keys are present, no obvious A/B/C/D option blocks remain, and each final-round pair shares its set tag. Previous score, draw, pounce, and audit history was cleared at the owner's request.
+
+### Sources and attribution
+
+- Source questions for Science, Sports, General Knowledge, and History are adapted from [OpenTriviaQA](https://github.com/uberspot/OpenTriviaQA), under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- Current-affairs questions carry source links in the database to official Press Information Bureau releases, Reuters reports, and NobelPrize.org.
+- The final round uses audio recordings linked from Wikimedia Commons. Consult each source file page for recording attribution and licence details.
 
 ## Hosting and database
 
-The production app is hosted at https://egs-quizit-0qep.hatchable.site. This repository mirrors the current source files; it is not configured as a GitHub Pages deployment. The application uses the connected Supabase project for its question bank, answer keys, settings, score events, draws, teams and pounce registrations. Supabase credentials and private server-side keys must not be committed here.
+The production app is hosted at https://egs-quizit-0qep.hatchable.site. This repository mirrors the current app source and original logo assets; it is not configured as a GitHub Pages deployment. The application uses the connected Supabase project for question text, answer keys, settings, scores, draws, teams, and pounce records.
 
-For a fresh environment, configure the Supabase URL and public/anon key in the client and provision the matching database schema, RLS policies and database functions before using the UI. The production database is not exported into this repository.
-
-## Important data status
-
-The replacement bank has been prepared and validated in a dry run, with 554 proposed open-ended questions (120 each for Science, Sports, General Knowledge and History, 58 Current Affairs items dated October 2026, and 16 Music questions arranged into eight paired audio slips). **That proposed bank has not been activated in production** because the authorized destructive operation was blocked before it ran. The live database therefore may still contain the previous choice-based bank. Do not treat the proposed replacement as live until a successful import has been verified.
-
-The OpenTriviaQA source is licensed under CC BY-SA 4.0: https://github.com/uberspot/OpenTriviaQA. Current-affairs items use source links in the bank builder.
+For a fresh environment, configure the Supabase project URL and public/anon key in the client and provision the matching database schema, RLS policies, and database functions. Do not commit Supabase service-role keys or other private credentials to this repository.
